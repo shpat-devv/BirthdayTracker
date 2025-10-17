@@ -16,6 +16,49 @@ body {
     overflow-x: hidden;
 }
 
+@media (max-width: 768px) {
+    body {
+        font-size: 0.9rem;
+    }
+    
+    .container {
+        width: 95%;
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .header {
+        padding: 2rem 1rem;
+    }
+    
+    .section {
+        padding: 1rem;
+    }
+    
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    table {
+        font-size: 0.85rem;
+    }
+    
+    th, td {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.85rem;
+    }
+    
+    button, input[type="submit"] {
+        width: 100%;
+        padding: 0.75rem;
+    }
+}
+
 .container {
     margin: 3rem auto;
     padding: 3rem;
