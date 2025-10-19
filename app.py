@@ -23,7 +23,10 @@ def login():
 
         print(f"checking {email}, {password}")
         user = User("temp", email, password) #temporary username, will be changed once the user is verified
-        user.exists()
+        if user.exists():
+            return render_template("login.html", response = "Valid")
+        else:
+            return render_template("login.html", response = "Failed")
 
     return render_template("login.html")
 
@@ -36,43 +39,39 @@ def sign_up():
         password = request.form.get("password")
 
         user = User(username, email, password)
-        user.save()
+        try:
+            user.save()
+            return render_template("signup.html", response = "Valid")
+        except Exception as e:
+            print(f"Error: {e}")
+            return render_template("signup.html", response = "Failed")
+
         
-        if username == "admin" and password == "1234":
-            session["user_id"] = 1
-            flash("Login successful!", "success")
-            return redirect(url_for("index"))
-        else:
-            flash("Invalid username or password.", "error")
-            return redirect(url_for("login"))
 
     return render_template("signup.html")
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    flash("Logged out successfully.", "info")
-    return redirect(url_for("login"))
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     # Require login
-    if "user_id" not in session:
-        flash("You must be logged in to access this page.", "error")
-        return redirect(url_for("login"))
-
     if request.method == "POST":
         name = request.form.get("name")
         month = request.form.get("month")
         day = request.form.get("day")
-        add_bday(name, month, day, session["user_id"])
-        flash(f"Added birthday for {name}!", "success")
+
+        print(f"Saving birthday for {name} on {month, day}")
         return redirect("/")
 
     # entries = get_bdays(session["user_id"])
     return render_template("index.html")  # , entries=entries)
 
+
+@app.route("/validate", methods=["GET"])
+def validate():
+    if request.method == "GET":
+        user_id = request.form.get("id")
+    else:
+        print("Wrong request method")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)
