@@ -1,6 +1,6 @@
 import os
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
-from api.models import User, Birthday
+from api.models import User, Birthday, verify
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -24,7 +24,7 @@ def login():
         print(f"checking {email}, {password}")
         user = User("temp", email, password) #temporary username, will be changed once the user is verified
         if user.exists():
-            return render_template("login.html", response = "Valid")
+            return render_template("login.html", user_id = user.get_id)
         else:
             return render_template("login.html", response = "Failed")
 
@@ -66,12 +66,18 @@ def index():
     return render_template("index.html")  # , entries=entries)
 
 
-@app.route("/validate", methods=["GET"])
+@app.route("/validate", methods=["POST"])
 def validate():
-    if request.method == "GET":
-        user_id = request.form.get("id")
+    user_id = request.form.get("id")
+
+    if not user_id:
+        return jsonify({"valid": False}), 400
+
+    if verify(user_id):
+        return jsonify({"valid": True}), 200
     else:
-        print("Wrong request method")
+        return jsonify({"valid": False}), 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)

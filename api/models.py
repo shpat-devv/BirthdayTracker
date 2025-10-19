@@ -2,6 +2,19 @@ from .database import Database
 
 db = Database("birthdays.db")
 
+def verify(id): #user id checking
+    db.connect()
+    result = db.cursor.execute(
+        "SELECT * FROM users WHERE user_id = ?", (id)
+    ).fetchone()
+    db.disconnect()
+    if result == None:
+        print("Id not found...")
+        return False
+    else:
+        print("Id found")
+        return True
+        
 class User:
     def __init__(self, name, email, password):
         self.user_id = None
@@ -9,21 +22,18 @@ class User:
         self.email = email
         self.password = password
 
-    def get_creds(self):
+    def get_id(self):
         db.connect()
         result = db.cursor.execute(
-            "SELECT * FROM users WHERE email = ?", (self.email,)
+            "SELECT user_id FROM users WHERE email = ? AND password = ?",
+            (self.email, self.password)
         ).fetchone()
         db.disconnect()
-        return result is not None
-    
-    def verify(self): #id checking
-        db.connect()
-        result = db.cursor.execute(
-            "SELECT * FROM users WHERE user_id = ?", (self.user_id,)
-        ).fetchone()
-        db.disconnect()
-        return result is not None
+
+        if result:
+            return result[0]  
+        else:
+            return None
     
     def exists(self): #email & password checking
         db.connect()
