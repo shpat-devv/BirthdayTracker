@@ -17,7 +17,7 @@ class User:
         db.disconnect()
         return result is not None
     
-    def verify(self):
+    def verify(self): #id checking
         db.connect()
         result = db.cursor.execute(
             "SELECT * FROM users WHERE user_id = ?", (self.user_id,)
@@ -25,13 +25,18 @@ class User:
         db.disconnect()
         return result is not None
     
-    def exists(self):
+    def exists(self): #email & password checking
         db.connect()
         result = db.cursor.execute(
             "SELECT * FROM users WHERE email = ? AND password = ?", (self.email, self.password)
         ).fetchone()
-        db.disconnect()
-        print(f"User found: {result}")
+
+        if result == None:
+            print("User not found...")
+            return False
+        else:
+            print("User found")
+            return True
 
     def get_birthdays(self):
         db.connect()
@@ -44,15 +49,11 @@ class User:
     def save(self):
         db.connect()
         if self.exists():
-            db.cursor.execute(
-                "UPDATE users SET name = ?, email = ?, password = ? WHERE user_id = ?",
-                (self.name, self.email, self.password, self.user_id)
-            )
+            print("User Already exists, ignoring save")
         else:
-            db.cursor.execute(
-                "INSERT INTO users (user_id, name, email, password) VALUES (?, ?, ?, ?)",
-                (self.user_id, self.name, self.email, self.password)
-            )
+            user_dict = {"name": self.name, "email": self.email, "password": self.password}
+            db.insert("users", user_dict)
+            
         db.connection.commit()
         db.disconnect()
         print(f"User {self.name} saved successfully.")

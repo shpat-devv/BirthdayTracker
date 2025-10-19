@@ -11,6 +11,7 @@ class Database:
             self.connection = sqlite3.connect(self.db_url, check_same_thread=False)
             self.connection.row_factory = sqlite3.Row
             self.cursor = self.connection.cursor()
+            print("Connection successful")
         else: 
             print("You're already connected, please disconnect first")
 
@@ -63,3 +64,5 @@ class Database:
             print(f"No record with user_id {id} found in {table}")
         else:
             print(f"Deleted record with user_id {id} from {table}")
+
+

@@ -4,7 +4,10 @@ from api.models import User, Birthday
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
+app.config.update(
+    TESTING=True,
+    SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf'
+)
 @app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -19,7 +22,7 @@ def login():
         password = request.form.get("password")
 
         print(f"checking {email}, {password}")
-        user = User(email, password)
+        user = User("temp", email, password) #temporary username, will be changed once the user is verified
         user.exists()
 
     return render_template("login.html")
