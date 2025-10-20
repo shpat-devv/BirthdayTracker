@@ -20,7 +20,7 @@ def login():
         password = request.form.get("password")
 
         user = User("temp", email, password)
-        if user.exists():
+        if user.exists(new_connection=True):
             user_id = user.get_id()
             session["user_id"] = user_id
             return render_template("login.html", user_id=user_id)

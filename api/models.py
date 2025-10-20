@@ -33,10 +33,14 @@ class User:
             return result[0]
         return None
     
-    def exists(self):
+    def exists(self, new_connection: bool):
+        if new_connection:
+            db.connect()
         result = db.cursor.execute(
             "SELECT * FROM users WHERE email = ? AND password = ?", (self.email, self.password)
         ).fetchone()
+        if new_connection:
+            db.disconnect()
         return result is not None
 
     def get_birthdays(self):
@@ -49,7 +53,7 @@ class User:
 
     def save(self):
         db.connect()
-        if self.exists():
+        if self.exists(new_connection=False):
             print("User Already exists, ignoring save")
         else:
             user_dict = {"name": self.name, "email": self.email, "password": self.password}
