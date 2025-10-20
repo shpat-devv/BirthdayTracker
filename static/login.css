@@ -107,19 +107,41 @@ button:hover {
 .footer-text a:hover {
     text-decoration: underline;
 }
-
 @media (max-width: 600px) {
+    body {
+        font-size: 1.5rem;
+        line-height: 2;
+    }
+
     .login-container {
-        width: 90%;
-        padding: 2rem;
+        width: 95%;
+        padding: 3.5rem;
     }
 
     h1 {
-        font-size: 1.8rem;
+        font-size: 3rem;
+    }
+
+    p.subtitle {
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"] {
+        font-size: 1.4rem;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     button {
-        font-size: 0.95rem;
-        padding: 0.7rem;
+        font-size: 1.4rem;
+        padding: 1.2rem 1.8rem;
+    }
+
+    .footer-text {
+        font-size: 1.2rem;
+        margin-top: 1.5rem;
     }
 }

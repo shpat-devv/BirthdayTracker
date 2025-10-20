@@ -34,11 +34,9 @@ class User:
         return None
     
     def exists(self):
-        db.connect()
         result = db.cursor.execute(
             "SELECT * FROM users WHERE email = ? AND password = ?", (self.email, self.password)
         ).fetchone()
-        db.disconnect()
         return result is not None
 
     def get_birthdays(self):

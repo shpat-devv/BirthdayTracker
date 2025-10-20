@@ -11,8 +11,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const userId = localStorage.getItem("user_id");
             if (!userId || userId === "undefined" || userId === "null") {
-                alert("Please log in to access your birthdays.");
-                window.location.replace("/login");
+                window.location.href = "/login";
             }
 
             const formData = new FormData();
@@ -25,14 +24,12 @@
             .then(response => response.json())
             .then(data => {
                 if (!data.valid) {
-                    alert("Invalid session. Redirecting to login.");
-                    window.location.replace("/login");
+                    window.location.href = "/login";
                 }
             })
             .catch(err => {
                 console.error("Validation error:", err);
-                alert("Error validating user. Redirecting to login.");
-                window.location.replace("/login");
+                window.location.href = "/login";
             });
         });
         </script>
