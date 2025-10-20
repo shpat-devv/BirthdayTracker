@@ -1,45 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthdays</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Poppins:wght@400;500;700&display=swap"
-        rel="stylesheet">
+    <title>🎉 Birthdays 🎂</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="/static/home.css" rel="stylesheet">
 </head>
-
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const userId = localStorage.getItem("user_id");
-
-            if (!userId) {
-                console.warn("No user_id found in localStorage.");
-                window.location.href = "/login";
+            if (!userId || userId === "undefined" || userId === "null") {
+                alert("Please log in to access your birthdays.");
+                window.location.replace("/login");
             }
 
             const formData = new FormData();
-            formData.append("user_id", userId);
+            formData.append("id", userId);
 
             fetch("/validate", {
                 method: "POST",
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Validation response:", data);
-                    if (data.valid) {
-                        console.log("User is valid");
-                    } else {
-                        console.log("Invalid user, redirecting...");
-                        window.location.href = "/login";
-                    }
-                })
-                .catch(error => console.error("Error validating user:", error));
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    alert("Invalid session. Redirecting to login.");
+                    window.location.replace("/login");
+                }
+            })
+            .catch(err => {
+                console.error("Validation error:", err);
+                alert("Error validating user. Redirecting to login.");
+                window.location.replace("/login");
+            });
         });
     </script>
 
@@ -71,7 +65,7 @@
 
         <div class="section">
             <h2>📅 All Birthdays</h2>
-            <div class="table-container">
+            <div class="table-container"> 
                 <table>
                     <thead>
                         <tr>
@@ -80,27 +74,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if entries %}
-                        {% for row in entries %}
-                        <tr>
-                            <td>{{ row.name }}</td>
-                            <td>{{ row.day }} / {{ row.month }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="2">No birthdays yet!</td>
-                        </tr>
-                        {% endif %}
+                        {% if birthdays %}
+                            {% for b in birthdays %}
+                            <tr>
+                                <td>{{ b[1] }}</td>
+                                <td>{{ b[2] }}/{{ b[3] }}</td>
+                            </tr>
+                            {% endfor %}
                     </tbody>
-                </table>
+                </table>   
+                {% else %}
+                    <p class="no-birthdays">You haven’t added any birthdays yet. 🎈</p>
+                {% endif %}
             </div>
         </div>
     </div>
-
-    <footer>
-        <p>Made with Flask</p>
-    </footer>
 </body>
-
 </html>

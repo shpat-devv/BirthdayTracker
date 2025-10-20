@@ -27,10 +27,11 @@
 
         {% if user_id %}
         <script>
+            alert("Login successful!");
             localStorage.setItem("user_id", "{{ user_id }}");
-            window.location.replace("/");
+            window.location.href = "/";
         </script>
-        {% else %}
+        {% elif response %}
         <script>
             alert("Invalid email or password. Please try again.");
         </script>

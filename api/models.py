@@ -103,7 +103,7 @@ class Birthday:
 
         db.connection.commit()
         db.disconnect()
-        print(f"Birthday {self.name} saved successfully.")
+        print(f"Birthday for {self.name} saved successfully.")
 
     def delete(self):
         db.connect()

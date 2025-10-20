@@ -1,13 +1,11 @@
 import os
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from api.models import User, Birthday, verify
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.config.update(
-    TESTING=True,
-    SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf'
-)
+app.config["SECRET_KEY"] = "192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
+
 @app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -21,15 +19,18 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        print(f"checking {email}, {password}")
-        user = User("temp", email, password) #temporary username, will be changed once the user is verified
+        print(f"Checking {email}, {password}")
+        user = User("temp", email, password)
+
         if user.exists():
-            return render_template("login.html", user_id = user.get_id)
+            user_id = user.get_id()
+            session["user_id"] = user_id  # store in session
+            print(f"Login successful: user_id = {user_id}")
+            return redirect(url_for("index"))
         else:
-            return render_template("login.html", response = "Failed")
+            return render_template("login.html", response="Failed")
 
     return render_template("login.html")
-
 
 @app.route("/signup", methods=["GET", "POST"])
 def sign_up():
@@ -41,30 +42,44 @@ def sign_up():
         user = User(username, email, password)
         try:
             user.save()
-            return render_template("signup.html", response = "Valid")
+            return render_template("signup.html", response="Valid")
         except Exception as e:
             print(f"Error: {e}")
-            return render_template("signup.html", response = "Failed")
-
-        
+            return render_template("signup.html", response="Failed")
 
     return render_template("signup.html")
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Require login
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect(url_for("login"))
+
+    user = User(None, None, None)
+    user.user_id = user_id  
+
     if request.method == "POST":
         name = request.form.get("name")
         month = request.form.get("month")
         day = request.form.get("day")
 
-        print(f"Saving birthday for {name} on {month, day}")
-        return redirect("/")
+        if name and month and day:
+            birthday = Birthday(None, name, day, month, user_id)
+            birthday.save()
+            print(f"Saved new birthday for {name}.")
+        else:
+            print("Missing fields in POST request.")
 
-    # entries = get_bdays(session["user_id"])
-    return render_template("index.html")  # , entries=entries)
+        return redirect(url_for("index"))
 
+    entries = user.get_birthdays()
+    return render_template("index.html", birthdays=entries)
+
+@app.route("/logout")
+def logout():
+    session.pop("user_id", None)
+    return redirect(url_for("login"))
 
 @app.route("/validate", methods=["POST"])
 def validate():
@@ -77,7 +92,6 @@ def validate():
         return jsonify({"valid": True}), 200
     else:
         return jsonify({"valid": False}), 400
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)
