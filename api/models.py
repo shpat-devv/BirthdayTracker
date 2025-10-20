@@ -2,13 +2,13 @@ from .database import Database
 
 db = Database("birthdays.db")
 
-def verify(id): #user id checking
+def verify(user_id):
     db.connect()
     result = db.cursor.execute(
-        "SELECT * FROM users WHERE user_id = ?", (id)
+        "SELECT * FROM users WHERE user_id = ?", (user_id,)
     ).fetchone()
     db.disconnect()
-    if result == None:
+    if result is None:
         print("Id not found...")
         return False
     else:
@@ -29,24 +29,17 @@ class User:
             (self.email, self.password)
         ).fetchone()
         db.disconnect()
-
         if result:
-            return result[0]  
-        else:
-            return None
+            return result[0]
+        return None
     
-    def exists(self): #email & password checking
+    def exists(self):
         db.connect()
         result = db.cursor.execute(
             "SELECT * FROM users WHERE email = ? AND password = ?", (self.email, self.password)
         ).fetchone()
-
-        if result == None:
-            print("User not found...")
-            return False
-        else:
-            print("User found")
-            return True
+        db.disconnect()
+        return result is not None
 
     def get_birthdays(self):
         db.connect()
@@ -63,7 +56,6 @@ class User:
         else:
             user_dict = {"name": self.name, "email": self.email, "password": self.password}
             db.insert("users", user_dict)
-            
         db.connection.commit()
         db.disconnect()
         print(f"User {self.name} saved successfully.")
@@ -89,7 +81,6 @@ class Birthday:
         result = db.cursor.execute(
             "SELECT * FROM birthdays WHERE birthday_id = ?", (self.birthday_id,)
         ).fetchone()
-
         if result:
             db.cursor.execute(
                 "UPDATE birthdays SET name = ?, day = ?, month = ?, user_id = ? WHERE birthday_id = ?",
@@ -100,7 +91,6 @@ class Birthday:
                 "INSERT INTO birthdays (birthday_id, name, day, month, user_id) VALUES (?, ?, ?, ?, ?)",
                 (self.birthday_id, self.name, self.day, self.month, self.user_id)
             )
-
         db.connection.commit()
         db.disconnect()
         print(f"Birthday for {self.name} saved successfully.")
