@@ -19,18 +19,16 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        print(f"Checking {email}, {password}")
         user = User("temp", email, password)
-
         if user.exists():
             user_id = user.get_id()
-            session["user_id"] = user_id  # store in session
-            print(f"Login successful: user_id = {user_id}")
-            return redirect(url_for("index"))
+            session["user_id"] = user_id
+            return render_template("login.html", user_id=user_id)
         else:
             return render_template("login.html", response="Failed")
 
     return render_template("login.html")
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def sign_up():
@@ -57,7 +55,7 @@ def index():
         return redirect(url_for("login"))
 
     user = User(None, None, None)
-    user.user_id = user_id  
+    user.user_id = user_id
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -67,14 +65,12 @@ def index():
         if name and month and day:
             birthday = Birthday(None, name, day, month, user_id)
             birthday.save()
-            print(f"Saved new birthday for {name}.")
-        else:
-            print("Missing fields in POST request.")
 
         return redirect(url_for("index"))
 
     entries = user.get_birthdays()
     return render_template("index.html", birthdays=entries)
+
 
 @app.route("/logout")
 def logout():
