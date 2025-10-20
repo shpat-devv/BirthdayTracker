@@ -16,7 +16,7 @@
             }
 
             const formData = new FormData();
-            formData.append("id", userId);
+            formData.append("user_id", userId); // updated key to match Flask
 
             fetch("/validate", {
                 method: "POST",
@@ -35,7 +35,8 @@
                 window.location.replace("/login");
             });
         });
-    </script>
+        </script>
+
 
     <div class="header">
         <h1>🎉 Birthdays 🎂</h1>

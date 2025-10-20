@@ -83,15 +83,19 @@ def logout():
 
 @app.route("/validate", methods=["POST"])
 def validate():
-    user_id = request.form.get("id")
-
+    user_id = request.form.get("user_id")
     if not user_id:
+        return jsonify({"valid": False}), 400
+
+    try:
+        user_id = int(user_id)
+    except ValueError:
         return jsonify({"valid": False}), 400
 
     if verify(user_id):
         return jsonify({"valid": True}), 200
-    else:
-        return jsonify({"valid": False}), 400
+    return jsonify({"valid": False}), 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)
